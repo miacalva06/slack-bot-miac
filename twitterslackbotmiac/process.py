@@ -1,11 +1,15 @@
-import os
+from os import environ
 import time
 import re
+import json
+from json import loads
+from tweepy.api import API
+from tweepy.auth import OAuthHandler
 from slackclient import SlackClient
-
+import sched, time
 
 # instantiate Slack client
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+slack_client = SlackClient(environ.get('SLACK_BOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
@@ -13,6 +17,33 @@ starterbot_id = None
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+
+def trends():
+    consumer_key = environ.get('consumer_key', None)
+    consumer_secret = environ.get('consumer_secret', None)
+    access_token = environ.get('access_token', None)
+    access_token_secret = environ.get('access_token_secret', None)
+
+
+    auth = OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = API(auth)
+
+
+    WOE_ID = 1
+
+    trends = api.trends_place(WOE_ID)
+
+    trends = json.loads(json.dumps(trends, indent=1))
+
+    trendy = []
+    for trend in trends[0]["trends"]:
+        trendy.append((trend["name"]))
+
+    trending = ', \n'.join(trendy[:10])
+
+    return trending
+
 
 def parse_bot_commands(slack_events):
     """
@@ -46,8 +77,11 @@ def handle_command(command, channel):
     # Finds and executes the given command, filling in response
     response = None
     # This is where you start to implement more commands!
+
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...write some more code then I can do that!"
+    else:
+        response = trends()
 
     # Sends the response back to the channel
     slack_client.api_call(
@@ -55,7 +89,6 @@ def handle_command(command, channel):
         channel=channel,
         text=response or default_response
     )
-
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
         print("Starter Bot connected and running!")
@@ -67,4 +100,4 @@ if __name__ == "__main__":
                 handle_command(command, channel)
             time.sleep(RTM_READ_DELAY)
     else:
-        print("Connection failed. Exception traceback printed above.")
+        print("Connection failed. Exception traceback printed above.") 
