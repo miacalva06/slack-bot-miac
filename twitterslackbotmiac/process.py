@@ -8,6 +8,7 @@ from tweepy.auth import OAuthHandler
 from slackclient import SlackClient
 import sched, time
 
+
 # instantiate Slack client
 slack_client = SlackClient(environ.get('SLACK_BOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
@@ -24,12 +25,12 @@ def trends():
     access_token = environ.get('access_token', None)
     access_token_secret = environ.get('access_token_secret', None)
 
-
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = API(auth)
 
-
+    # Where On Earth ID for Pasig is 1187115.
+    # Where On Earth ID for Worldwide 1.
     WOE_ID = 1
 
     trends = api.trends_place(WOE_ID)
@@ -100,4 +101,4 @@ if __name__ == "__main__":
                 handle_command(command, channel)
             time.sleep(RTM_READ_DELAY)
     else:
-        print("Connection failed. Exception traceback printed above.") 
+        print("Connection failed. Exception traceback printed above.")
