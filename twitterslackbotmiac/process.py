@@ -19,10 +19,12 @@ EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 def trends(channel='assignment1', scheduled=True):
+    '''
     consumer_key = environ.get('consumer_key', None)
     consumer_secret = environ.get('consumer_secret', None)
     access_token = environ.get('access_token', None)
     access_token_secret = environ.get('access_token_secret', None)
+    '''
 
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -93,7 +95,7 @@ if __name__ == "__main__":
         print("Starter Bot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
-        schedule.every().minute.do(trends)
+        schedule.every(24).hours.do(trends)
         while True:
             schedule.run_pending()
             time.sleep(RTM_READ_DELAY)
