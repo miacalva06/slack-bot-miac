@@ -7,9 +7,9 @@ from tweepy.api import API
 from tweepy.auth import OAuthHandler
 from slackclient import SlackClient
 import schedule, time
-
+import config
 # instantiate Slack client
-slack_client = SlackClient(environ.get('SLACK_BOT_TOKEN'))
+slack_client = SlackClient(config.SLACK_BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
@@ -26,8 +26,8 @@ def trends(channel='assignment1', scheduled=True):
     access_token_secret = environ.get('access_token_secret', None)
     '''
 
-    auth = OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
+    auth = OAuthHandler(config.consumer_key, config.consumer_secret)
+    auth.set_access_token(config.access_token, config.access_token_secret)
     api = API(auth)
 
     # Where On Earth ID for Pasig is 1187115.
